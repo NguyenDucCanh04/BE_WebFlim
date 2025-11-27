@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\BaiViet;
+use App\Models\ChiTietPhanQuyen;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BaiVietController extends Controller
 {

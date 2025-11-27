@@ -2,64 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChiTietPhanQuyen;
 use App\Models\ChucNang;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ChucNangController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function getData()
     {
-        //
-    }
+        $id_chuc_nang = 42;
+        $login = Auth::guard('sanctum')->user();
+        $id_quyen = $login->$id_chuc_nang;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if ($check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "bạn không có quyền thực hiện chức năng này!"
+            ]);
+        }
+        $data = ChucNang::get();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(ChucNang $chucNang)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ChucNang $chucNang)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ChucNang $chucNang)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ChucNang $chucNang)
-    {
-        //
+        return response()->json([
+            'data' => $data
+        ]);
     }
 }

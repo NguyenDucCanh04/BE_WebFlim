@@ -21,6 +21,7 @@ class KhachHang extends Authenticatable
         'gioi_tinh',
         'ngay_sinh',
         'anh_dai_dien',
-        'trang_thai'
+        'trang_thai',
+        'quyen_id'
     ];
 }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\PhongChieu;
+use App\Models\ChiTietPhanQuyen;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PhongChieuController extends Controller
 {
@@ -28,7 +30,28 @@ class PhongChieuController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // ID chức năng 14: Thêm Phòng Chiếu Mới
+        $id_chuc_nang = 14;
+        $login = Auth::guard('sanctum')->user();
+        if (!$login) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn chưa đăng nhập!"
+            ], 401);
+        }
+
+        $id_quyen = $login->id_quyen;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if (!$check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn không có quyền thực hiện chức năng này!"
+            ], 403);
+        }
+
+        // ...existing code...
     }
 
     /**
@@ -52,14 +75,105 @@ class PhongChieuController extends Controller
      */
     public function update(Request $request, PhongChieu $phongChieu)
     {
-        //
+        // ID chức năng 15: Cập Nhật Phòng Chiếu
+        $id_chuc_nang = 15;
+        $login = Auth::guard('sanctum')->user();
+        if (!$login) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn chưa đăng nhập!"
+            ], 401);
+        }
+
+        $id_quyen = $login->id_quyen;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if (!$check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn không có quyền thực hiện chức năng này!"
+            ], 403);
+        }
+
+        // ...existing code...
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(PhongChieu $phongChieu)
+    public function destroy(Request $request)
     {
-        //
+        // ID chức năng 16: Xóa Phòng Chiếu
+        $id_chuc_nang = 16;
+        $login = Auth::guard('sanctum')->user();
+        if (!$login) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn chưa đăng nhập!"
+            ], 401);
+        }
+
+        $id_quyen = $login->id_quyen;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if (!$check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn không có quyền thực hiện chức năng này!"
+            ], 403);
+        }
+
+        // ...existing code...
+    }
+
+    public function chuyenTinhTrang(Request $request)
+    {
+        // ID chức năng 17: Đổi Trạng Thái Phòng Chiếu
+        $id_chuc_nang = 17;
+        $login = Auth::guard('sanctum')->user();
+        if (!$login) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn chưa đăng nhập!"
+            ], 401);
+        }
+
+        $id_quyen = $login->id_quyen;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if (!$check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn không có quyền thực hiện chức năng này!"
+            ], 403);
+        }
+
+        // ...existing code...
+    }
+
+    public function getData()
+    {
+        // ID chức năng 13: Xem Danh Sách Phòng Chiếu
+        $id_chuc_nang = 13;
+        $login = Auth::guard('sanctum')->user();
+        if (!$login) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn chưa đăng nhập!"
+            ], 401);
+        }
+
+        $id_quyen = $login->id_quyen;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if (!$check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn không có quyền thực hiện chức năng này!"
+            ], 403);
+        }
+
+        // ...existing code...
     }
 }

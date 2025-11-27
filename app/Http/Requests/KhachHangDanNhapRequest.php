@@ -31,10 +31,10 @@ class KhachHangDanNhapRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'email.required' => 'Email không được để trống',
+            'email.required' => 'Vui lòng nhập Email',
             'email.exists' => 'Email không tồn tại',
             'email.email' => 'Email không đúng định dạng',
-            'password.required' => 'Mật khẩu không được để trống',
+            'password.required' => 'Vui lòng nhập Mật khẩu',
         ];
     }
 }

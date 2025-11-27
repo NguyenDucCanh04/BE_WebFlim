@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChiTietPhanQuyen;
 use App\Models\GheNgoi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class GheNgoiController extends Controller
 {
@@ -28,6 +30,27 @@ class GheNgoiController extends Controller
      */
     public function store(Request $request)
     {
+        // ID chức năng 19: Thêm Ghế Mới
+        $id_chuc_nang = 19;
+        $login = Auth::guard('sanctum')->user();
+        if (!$login) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn chưa đăng nhập!"
+            ], 401);
+        }
+
+        $id_quyen = $login->id_quyen;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if (!$check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn không có quyền thực hiện chức năng này!"
+            ], 403);
+        }
+
         //
     }
 
@@ -62,4 +85,32 @@ class GheNgoiController extends Controller
     {
         //
     }
+
+    public function getData()
+    {
+        // ID chức năng 18: Xem Danh Sách Ghế
+        $id_chuc_nang = 18;
+        $login = Auth::guard('sanctum')->user();
+        if (!$login) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn chưa đăng nhập!"
+            ], 401);
+        }
+
+        $id_quyen = $login->id_quyen;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if (!$check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn không có quyền thực hiện chức năng này!"
+            ], 403);
+        }
+
+        // ...existing code...
+
+
+}    
 }

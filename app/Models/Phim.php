@@ -20,7 +20,10 @@ class Phim extends Model
         'trailer_url',
         'poster_url',
         'ngay_tao',
-        'trang_thai'
+        'trang_thai',
+        'trang_thai_chieu',
+        'ngay_tao',
+        'ngay_khoi_chieu',
     ];
 
 

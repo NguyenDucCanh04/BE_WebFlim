@@ -8,6 +8,9 @@ use App\Http\Controllers\PhimController;
 use App\Http\Controllers\SuatChieuController;
 use App\Http\Controllers\DatVeController;
 use App\Http\Controllers\TheLoaiController;
+use App\Http\Controllers\QuyenController;
+use App\Http\Controllers\ChucNangController;
+use App\Http\Controllers\ChiTietPhanQuyenController;
 
 Route::post('khach-hang/dang-nhap', [KhachHangController::class, 'dangNhap']);
 Route::post('khach-hang/dang-ky', [KhachHangController::class, 'dangKy']);
@@ -24,9 +27,8 @@ Route::post('/admin/dang-nhap', [AdminController::class, 'dangNhap']);
 Route::post('/admin/dang-ky', [AdminController::class, 'dangKy']);
 Route::get('/kiem-tra-admin', [AdminController::class, 'kiemTraAdmin']);
 
-Route::get('/getDataPhim', [PhimController::class, 'getData']);
-Route::get('phim/{id}', [PhimController::class, 'show']);
-Route::get('suat-chieu', [SuatChieuController::class, 'index']); // ?phim_id=
+
+Route::get('suat-chieu', [SuatChieuController::class, 'index']);
 Route::post('dat-ve', [DatVeController::class, 'store']);
 
 
@@ -41,3 +43,25 @@ Route::get('/the-loai/data-open', [TheLoaiController::class, 'getDataOpen']);
 
 // phân trang phim theo thể loại (frontend gọi: /api/layThongTinPhimTuTheLoai/{id})
 Route::get('layThongTinPhimTuTheLoai/{id}', [TheLoaiController::class, 'layThongTinPhimTuTheLoai']);
+Route::get('/getDataPhim', [PhimController::class, 'getData']);
+Route::get('/phim/search', [PhimController::class, 'search']);
+Route::get('/phim/{id}', [PhimController::class, 'show']);
+Route::get('/phim/dang-chieu', [PhimController::class, 'getPhimDangChieu']);
+Route::get('/phim/sap-chieu', [PhimController::class, 'getPhimSapChieu']);
+
+// Admin routes (cần middleware)
+Route::post('/admin/phim/create', [PhimController::class, 'store'])->middleware("AdminMiddle");
+Route::post('/admin/phim/update', [PhimController::class, 'update'])->middleware("AdminMiddle");
+Route::post('/admin/phim/delete', [PhimController::class, 'destroy'])->middleware("AdminMiddle");
+Route::post('/admin/phim/chuyen-trang-thai', [PhimController::class, 'chuyenTinhTrang'])->middleware("AdminMiddle");
+Route::post('/admin/phim/chuyen-trang-thai-chieu', [PhimController::class, 'chuyenTrangThaiChieu'])->middleware("AdminMiddle");
+// ...existing code...
+Route::get('/admin/phan-quyen/data', [QuyenController::class, 'getData'])->middleware("AdminMiddle");
+Route::post('/admin/phan-quyen/create', [QuyenController::class, 'createData'])->middleware("AdminMiddle");
+Route::delete('/admin/phan-quyen/delete/{id}', [QuyenController::class, 'deleteData'])->middleware("AdminMiddle");
+Route::put('/admin/phan-quyen/update', [QuyenController::class, 'UpateData'])->middleware("AdminMiddle");
+Route::post('/admin/phan-quyen/tim-kiem', [QuyenController::class, 'search'])->middleware("AdminMiddle");
+Route::post('/admin/chi-tiet-phan-quyen/cap-quyen', [ChiTietPhanQuyenController::class, 'capQuyen'])->middleware("NhanVienMiddle");
+Route::post('/admin/chi-tiet-phan-quyen/danh-sach', [ChiTietPhanQuyenController::class, 'getData'])->middleware("NhanVienMiddle");
+Route::post('/admin/chi-tiet-phan-quyen/xoa-quyen', [ChiTietPhanQuyenController::class, 'xoaQuyen'])->middleware("NhanVienMiddle");
+Route::get('/admin/chuc-nang/data', [ChucNangController::class, 'getData'])->middleware("NhanVienMiddle");

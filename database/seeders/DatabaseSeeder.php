@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,7 +17,7 @@ class DatabaseSeeder extends Seeder
    public function run(): void
 {
 
-
+     Schema::disableForeignKeyConstraints();
     $this->call([
         KhachHangSeeder::class,
         AdminSeeder::class,
@@ -39,7 +40,6 @@ class DatabaseSeeder extends Seeder
         BaiVietSeeder::class,
         DanhGiaPhimSeeder::class,
     ]);
-
-    
+    Schema::enableForeignKeyConstraints();
 }
 }

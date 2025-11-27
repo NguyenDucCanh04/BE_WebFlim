@@ -20,7 +20,9 @@ return new class extends Migration {
             $table->string('movie_url')->nullable();
             $table->string('poster_url')->nullable();
             $table->timestamp('ngay_tao')->useCurrent();
+            $table->timestamp('ngay_khoi_chieu')->nullable();
             $table->tinyInteger('trang_thai')->default(1);
+            $table->tinyInteger('trang_thai_chieu')->default(1);
             $table->timestamps();
         });
     }

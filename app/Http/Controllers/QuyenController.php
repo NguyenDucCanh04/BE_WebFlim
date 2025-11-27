@@ -2,64 +2,127 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChiTietPhanQuyen;
 use App\Models\Quyen;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class QuyenController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+    public function search(Request $request){
+        $noi_dung_tim = '%'. $request->noi_dung_tim . '%';
+        $data   =  Quyen::where('ten_quyen', 'like', $noi_dung_tim)
+                            ->get();
+        return response()->json([
+            'data'  => $data
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function getData()
     {
-        //
+        $id_chuc_nang = 38;
+        $login = Auth::guard('sanctum')->user();
+        $id_quyen = $login->$id_chuc_nang;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if ($check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "bạn không có quyền thực hiện chức năng này!"
+            ]);
+        }
+        $data = Quyen::get();
+
+        return response()->json([
+            'data' => $data
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function createData(Request $request)
     {
-        //
+        $id_chuc_nang = 39;
+        $login = Auth::guard('sanctum')->user();
+        $id_quyen = $login->$id_chuc_nang;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if ($check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "bạn không có quyền thực hiện chức năng này!"
+            ]);
+        }
+        Quyen::create([
+            'ten_quyen'         => $request->ten_quyen,
+        ]);
+
+        return response()->json([
+            'status'    => true,
+            'message'   => 'Thêm mới tên quyền thành công!'
+        ]);
+    }
+    public function UpateData(Request $request)
+    {
+        $id_chuc_nang = 40;
+        $login = Auth::guard('sanctum')->user();
+        $id_quyen = $login->$id_chuc_nang;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if ($check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "bạn không có quyền thực hiện chức năng này!"
+            ]);
+        }
+        $ten_quyen = Quyen::where('id', $request->id)->first();
+        if($ten_quyen) {
+            $ten_quyen->update([
+                'ten_quyen'             => $request->ten_quyen,
+
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => "Cập Nhật tên quyền thành công!"
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => "Có Lỗi"
+            ]);
+        }
+    }
+    public function deleteData($id)
+    {
+        $id_chuc_nang = 41;
+        $login = Auth::guard('sanctum')->user();
+        $id_quyen = $login->$id_chuc_nang;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if ($check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "bạn không có quyền thực hiện chức năng này!"
+            ]);
+        }
+        $ten_quyen = Quyen::where('id', $id)->first();
+
+        if($ten_quyen) {
+            $ten_quyen->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => "Đã xóa tên quyền thành công!"
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => "Có Lỗi"
+            ]);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Quyen $quyen)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Quyen $quyen)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Quyen $quyen)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Quyen $quyen)
-    {
-        //
-    }
 }

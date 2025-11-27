@@ -38,7 +38,7 @@ class KhachHangController extends Controller
         } else {
             return response()->json([
                 'status'    => false,
-                'message'   => "Tài khoản hoặc mật khẩu không đúng!",
+                'message'   => "Sai tài khoản hoặc mật khẩu",
             ]);
         }
     }
@@ -104,27 +104,36 @@ class KhachHangController extends Controller
             ]);
         }
     }
-     public function quenMK(Request $request)
+    public function quenMK(Request $request)
     {
         $khach_hang = KhachHang::where('email', $request->email)->first();
-        if($khach_hang){
-            $hash_reset         = Str::uuid();
-            $x['ho_va_ten']     = $khach_hang->ho_va_ten;
-            $x['link']          = 'http://localhost:5173/khach-hang/doi-mat-khau/' . $hash_reset;
-            Mail::to($request->email)->send(new MasterMail('Đổi Mật Khẩu Của Bạn', 'quen_mat_khau', $x));
+
+        if ($khach_hang) {
+
+            $hash_reset = Str::uuid();
+
+            // biến đúng
+            $x['ho_ten'] = $khach_hang->ho_ten;
+            $x['link'] = 'http://localhost:5173/khach-hang/doi-mat-khau/' . $hash_reset;
+
+            Mail::to($request->email)
+                ->send(new MasterMail('Đổi mật khẩu', 'quen_mat_khau', $x));
+
             $khach_hang->hash_reset = $hash_reset;
             $khach_hang->save();
+
             return response()->json([
-                'status'    =>  true,
-                'message'   =>  'Vui Lòng kiểm tra lại email'
-            ]);
-        } else {
-            return response()->json([
-                'status'    =>  false,
-                'message'   =>  'Email không có trong hệ thống'
+                'status' => true,
+                'message' => 'Vui lòng kiểm tra email của bạn'
             ]);
         }
+
+        return response()->json([
+            'status' => false,
+            'message' => 'Email không tồn tại trong hệ thống'
+        ]);
     }
+
     public function logout(Request $request)
     {
         $khach_hang   = Auth::guard('sanctum')->user();
@@ -145,14 +154,198 @@ class KhachHangController extends Controller
 
     public function doiMK(KhachHangDoiMatKhauRequest $request)
     {
-        $khachHang           = KhachHang::where('hash_reset', $request->id)->first();
+        $khachHang = KhachHang::where('hash_reset', $request->id)->first();
+
+        if (!$khachHang) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Link đặt lại mật khẩu không hợp lệ'
+            ]);
+        }
+
         $khachHang->password = bcrypt($request->password);
-        $khachHang->hash_reset = NULL;
+        $khachHang->hash_reset = null;
         $khachHang->save();
 
         return response()->json([
-            'status'    =>  true,
-            'message'   =>  'Đã đổi mật khẩu thành công'
+            'status' => true,
+            'message' => 'Đổi mật khẩu thành công!'
         ]);
+    }
+    public function getData()
+    {
+        // ID chức năng 33: Xem Danh Sách Khách Hàng
+        $id_chuc_nang = 33;
+        $login = Auth::guard('sanctum')->user();
+        if (!$login) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn chưa đăng nhập!"
+            ], 401);
+        }
+
+        $id_quyen = $login->id_quyen;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if (!$check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn không có quyền thực hiện chức năng này!"
+            ], 403);
+        }
+
+        $ds_khach_hang = KhachHang::all();
+
+        return response()->json([
+            'data' => $ds_khach_hang,
+            'message' => "Lấy danh sách khách hàng thành công!"
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+        // ID chức năng 35: Cập Nhật Thông Tin Khách Hàng
+        $id_chuc_nang = 35;
+        $login = Auth::guard('sanctum')->user();
+        if (!$login) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn chưa đăng nhập!"
+            ], 401);
+        }
+
+        $id_quyen = $login->id_quyen;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if (!$check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn không có quyền thực hiện chức năng này!"
+            ], 403);
+        }
+
+        $khach_hang = KhachHang::find($request->id);
+        if (!$khach_hang) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Khách hàng không tồn tại'
+            ]);
+        }
+
+        $khach_hang->ho_ten = $request->ho_ten;
+        $khach_hang->email = $request->email;
+        $khach_hang->so_dien_thoai = $request->so_dien_thoai;
+        $khach_hang->ngay_sinh = $request->ngay_sinh;
+        $khach_hang->gioi_tinh = $request->gioi_tinh;
+
+        $check = $khach_hang->save();
+
+        if ($check) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Cập nhật thông tin khách hàng thành công'
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Cập nhật thông tin khách hàng thất bại'
+            ]);
+        }
+    }
+
+    public function destroy(Request $request)
+    {
+        // ID chức năng 36: Xóa Tài Khoản Khách Hàng
+        $id_chuc_nang = 36;
+        $login = Auth::guard('sanctum')->user();
+        if (!$login) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn chưa đăng nhập!"
+            ], 401);
+        }
+
+        $id_quyen = $login->id_quyen;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if (!$check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn không có quyền thực hiện chức năng này!"
+            ], 403);
+        }
+
+        $khach_hang = KhachHang::find($request->id);
+        if (!$khach_hang) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Khách hàng không tồn tại'
+            ]);
+        }
+
+        $check = $khach_hang->delete();
+
+        if ($check) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Xóa khách hàng thành công'
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Xóa khách hàng thất bại'
+            ]);
+        }
+    }
+
+    public function chuyenTinhTrang(Request $request)
+    {
+        // ID chức năng 37: Đổi Trạng Thái Khách Hàng
+        $id_chuc_nang = 37;
+        $login = Auth::guard('sanctum')->user();
+        if (!$login) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn chưa đăng nhập!"
+            ], 401);
+        }
+
+        $id_quyen = $login->id_quyen;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if (!$check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "Bạn không có quyền thực hiện chức năng này!"
+            ], 403);
+        }
+
+        $khach_hang = KhachHang::find($request->id);
+        if (!$khach_hang) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Khách hàng không tồn tại'
+            ]);
+        }
+
+        $khach_hang->trang_thai = $request->trang_thai;
+
+        $check = $khach_hang->save();
+
+        if ($check) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Đổi trạng thái khách hàng thành công'
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Đổi trạng thái khách hàng thất bại'
+            ]);
+        }
     }
 }
