@@ -87,8 +87,8 @@ class KhachHangController extends Controller
     {
         $tai_khoan_dang_dang_nhap   = Auth::guard('sanctum')->user();
         $check = KhachHang::where('id', $tai_khoan_dang_dang_nhap->id)->update([
-            'email'         => $request->email,
             'so_dien_thoai' => $request->so_dien_thoai,
+            'ngay_sinh' => $request->ngay_sinh,
             'ho_ten'     => $request->ho_ten,
         ]);
 
@@ -345,6 +345,161 @@ class KhachHangController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Đổi trạng thái khách hàng thất bại'
+            ]);
+        }
+    }
+      public function dataKhachHang()
+    {
+
+        $id_chuc_nang = 28;
+        $login = Auth::guard('sanctum')->user();
+        $id_quyen = $login->$id_chuc_nang;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if ($check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "bạn không có quyền thực hiện chức năng này!"
+            ]);
+        }
+        $data = KhachHang::get();
+
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+     public function kichHoatTaiKhoan(Request $request)
+    {
+
+        $id_chuc_nang = 29;
+        $login = Auth::guard('sanctum')->user();
+        $id_quyen = $login->$id_chuc_nang;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if ($check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "bạn không có quyền thực hiện chức năng này!"
+            ]);
+        }
+        $khach_hang = KhachHang::where('id', $request->id)->first();
+
+        if ($khach_hang) {
+            if ($khach_hang->trang_thai == 0) {
+                $khach_hang->trang_thai = 1;
+                $khach_hang->save();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => "Đã kích hoạt tài khoản thành công!"
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => "Có lỗi xảy ra!"
+            ]);
+        }
+    }
+    public function doiTrangThaiKhachHang(Request $request)
+    {
+
+        $id_chuc_nang = 30;
+        $login = Auth::guard('sanctum')->user();
+        $id_quyen = $login->$id_chuc_nang;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if ($check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "bạn không có quyền thực hiện chức năng này!"
+            ]);
+        }
+        $khach_hang = KhachHang::where('id', $request->id)->first();
+
+        if ($khach_hang) {
+            $khach_hang->trang_thai = !$khach_hang->trang_thai;
+            $khach_hang->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => "Đã đổi trạng thái tài khoản thành công!"
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => "Có lỗi xảy ra!"
+            ]);
+        }
+    }
+
+    public function updateTaiKhoan(Request $request)
+    {
+
+        $id_chuc_nang = 31;
+        $login = Auth::guard('sanctum')->user();
+        $id_quyen = $login->$id_chuc_nang;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if ($check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "bạn không có quyền thực hiện chức năng này!"
+            ]);
+        }
+        $khach_hang = KhachHang::where('id', $request->id)->first();
+
+        if ($khach_hang) {
+            $khach_hang->update([
+                'email'             => $request->email,
+                'so_dien_thoai'     => $request->so_dien_thoai,
+                'ho_va_ten'         => $request->ho_va_ten,
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => "Đã cập nhật tài khoản thành công!"
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => "Có lỗi xảy ra!"
+            ]);
+        }
+    }
+
+    public function deleteTaiKhoan(Request $request)
+    {
+
+        $id_chuc_nang = 32;
+        $login = Auth::guard('sanctum')->user();
+        $id_quyen = $login->$id_chuc_nang;
+        $check_quyen = ChiTietPhanQuyen::where('id_quyen', $id_quyen)
+            ->where('id_chuc_nang', $id_chuc_nang)
+            ->first();
+        if ($check_quyen) {
+            return response()->json([
+                'data' => false,
+                'message' => "bạn không có quyền thực hiện chức năng này!"
+            ]);
+        }
+        $khach_hang = KhachHang::where('id', $request->id)->first();
+
+        if ($khach_hang) {
+            $khach_hang->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => "Đã đổi trạng thái tài khoản thành công!"
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => "Có lỗi xảy ra!"
             ]);
         }
     }

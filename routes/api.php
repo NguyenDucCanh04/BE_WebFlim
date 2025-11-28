@@ -26,7 +26,15 @@ Route::post('/khach-hang/doi-mat-khau', [KhachHangController::class, 'doiMK']);
 Route::post('/admin/dang-nhap', [AdminController::class, 'dangNhap']);
 Route::post('/admin/dang-ky', [AdminController::class, 'dangKy']);
 Route::get('/kiem-tra-admin', [AdminController::class, 'kiemTraAdmin']);
+Route::post('/admin/dang-xuat', [AdminController::class, 'logout']);
+Route::get('/admin/profile/data', [AdminController::class, 'getDataProfile'])->middleware("AdminMiddle");
+Route::post('/admin/profile/update', [AdminController::class, 'updateProfile'])->middleware("AdminMiddle");
 
+Route::get('/admin/khach-hang/data', [KhachHangController::class, 'dataKhachHang'])->middleware("AdminMiddle");
+Route::post('/admin/khach-hang/kich-hoat-tai-khoan', [KhachHangController::class, 'kichHoatTaiKhoan'])->middleware("AdminMiddle");
+Route::post('/admin/khach-hang/doi-trang-thai', [KhachHangController::class, 'doiTrangThaiKhachHang'])->middleware("AdminMiddle");
+Route::post('/admin/khach-hang/update', [KhachHangController::class, 'updateTaiKhoan'])->middleware("AdminMiddle");
+Route::post('/admin/khach-hang/delete', [KhachHangController::class, 'deleteTaiKhoan'])->middleware("AdminMiddle");
 
 Route::get('suat-chieu', [SuatChieuController::class, 'index']);
 Route::post('dat-ve', [DatVeController::class, 'store']);

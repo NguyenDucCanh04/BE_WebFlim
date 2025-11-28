@@ -7,6 +7,7 @@ use App\Models\Admin;
 use App\Models\ChiTietPhanQuyen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -35,12 +36,12 @@ class AdminController extends Controller
             ]);
         }
     }
-     public function kiemTraAdmin()
+    public function kiemTraAdmin()
     {
         $tai_khoan_dang_dang_nhap   = Auth::guard('sanctum')->user();
         // Khi đang đăng nhập ở đây có thể là: Khách Hàng, Đại Lý, Admin
         // Chúng phải kiểm tra $tai_khoan_dang_dang_nhap có phải là tài khoản Admin/Nhân Viên hay kihoong?
-        if($tai_khoan_dang_dang_nhap && $tai_khoan_dang_dang_nhap instanceof \App\Models\Admin) {
+        if ($tai_khoan_dang_dang_nhap && $tai_khoan_dang_dang_nhap instanceof \App\Models\Admin) {
             return response()->json([
                 'status'    =>  true
             ]);
@@ -51,37 +52,7 @@ class AdminController extends Controller
             ]);
         }
     }
-     public function getDataProfile()
-    {
-        $tai_khoan_dang_dang_nhap   = Auth::guard('sanctum')->user();
-        return response()->json([
-            'data'    =>  $tai_khoan_dang_dang_nhap
-        ]);
-    }
-
-    public function updateProfile(Request $request)
-    {
-        $tai_khoan_dang_dang_nhap   = Auth::guard('sanctum')->user();
-        $check = Admin::where('id', $tai_khoan_dang_dang_nhap->id)->update([
-            'email'         => $request->email,
-            'ho_va_ten'     => $request->ho_va_ten,
-            'so_dien_thoai' => $request->so_dien_thoai,
-            'dia_chi'       => $request->dia_chi,
-        ]);
-
-        if($check) {
-            return response()->json([
-                'status'    =>  true,
-                'message'   =>  'Cập nhật profile thành công'
-            ]);
-        } else {
-            return response()->json([
-                'status'    =>  false,
-                'message'   =>  'Cập nhật thất bại'
-            ]);
-        }
-    }
-     public function changeStatus(Request $request)
+    public function changeStatus(Request $request)
     {
 
         $id_chuc_nang = 26;
@@ -98,8 +69,8 @@ class AdminController extends Controller
         }
         $nhanVien = Admin::where('id', $request->id)->first();
 
-        if($nhanVien) {
-            if($nhanVien->tinh_trang == 0) {
+        if ($nhanVien) {
+            if ($nhanVien->tinh_trang == 0) {
                 $nhanVien->tinh_trang = 1;
             } else {
                 $nhanVien->tinh_trang = 0;
@@ -309,5 +280,49 @@ class AdminController extends Controller
             'message'   => "Đã đổi trạng thái admin thành công!"
         ]);
     }
+    public function logout(Request $request)
+    {
+        $nhanVien   = Auth::guard('sanctum')->user();
+        if ($nhanVien && $nhanVien instanceof \App\Models\Admin) {
+            DB::table('personal_access_tokens')
+                ->where('id', $nhanVien->currentAccessToken()->id)->delete();
+            return response()->json([
+                'status' => true,
+                'message' => "Bạn đã đăng xuất thành công!"
+            ]);
+        }
+    }
+
+    public function getDataProfile()
+    {
+        $tai_khoan_dang_dang_nhap   = Auth::guard('sanctum')->user();
+        return response()->json([
+            'data'    =>  $tai_khoan_dang_dang_nhap
+        ]);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $tai_khoan_dang_dang_nhap   = Auth::guard('sanctum')->user();
+        $check = Admin::where('id', $tai_khoan_dang_dang_nhap->id)->update([
+
+            'so_dien_thoai' => $request->so_dien_thoai,
+            'ngay_sinh' => $request->ngay_sinh,
+            'ho_ten'     => $request->ho_ten,
+        ]);
+
+        if ($check) {
+            return response()->json([
+                'status'    =>  true,
+                'message'   =>  'Cập nhật profile thành công'
+            ]);
+        } else {
+            return response()->json([
+                'status'    =>  false,
+                'message'   =>  'Cập nhật thất bại'
+            ]);
+        }
+    }
+    
 
 }
