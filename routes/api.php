@@ -11,6 +11,7 @@ use App\Http\Controllers\TheLoaiController;
 use App\Http\Controllers\QuyenController;
 use App\Http\Controllers\ChucNangController;
 use App\Http\Controllers\ChiTietPhanQuyenController;
+use App\Http\Controllers\BaiVietController;
 
 Route::post('khach-hang/dang-nhap', [KhachHangController::class, 'dangNhap']);
 Route::post('khach-hang/dang-ky', [KhachHangController::class, 'dangKy']);
@@ -20,6 +21,7 @@ Route::post('/khach-hang/profile/update', [KhachHangController::class, 'updatePr
 Route::post('/khach-hang/dang-xuat', [KhachHangController::class, 'logout']);
 Route::post('/khach-hang/quen-mat-khau', [KhachHangController::class, 'quenMK']);
 Route::post('/khach-hang/doi-mat-khau', [KhachHangController::class, 'doiMK']);
+Route::post('/khach-hang/doi-mat-khau/profile', [KhachHangController::class, 'doiMatKhauProfile'])->middleware("KhachHangMiddle");
 
 
 
@@ -73,3 +75,13 @@ Route::post('/admin/chi-tiet-phan-quyen/cap-quyen', [ChiTietPhanQuyenController:
 Route::post('/admin/chi-tiet-phan-quyen/danh-sach', [ChiTietPhanQuyenController::class, 'getData'])->middleware("NhanVienMiddle");
 Route::post('/admin/chi-tiet-phan-quyen/xoa-quyen', [ChiTietPhanQuyenController::class, 'xoaQuyen'])->middleware("NhanVienMiddle");
 Route::get('/admin/chuc-nang/data', [ChucNangController::class, 'getData'])->middleware("NhanVienMiddle");
+
+
+Route::get('/bai-viet/search', [BaiVietController::class, 'search']);
+Route::get('/bai-viet', [BaiVietController::class, 'getData']);
+Route::get('/bai-viet-moi', [BaiVietController::class, 'getDataBaiVietMoi']);
+Route::get('/bai-viet/{id}', [BaiVietController::class, 'show']);
+Route::post('/bai-viet/create', [BaiVietController::class, 'store']);
+Route::post('/bai-viet/update', [BaiVietController::class, 'update']);
+Route::post('/bai-viet/delete', [BaiVietController::class, 'destroy']);
+Route::post('/bai-viet/trang-thai', [BaiVietController::class, 'chuyenTrangThai']);

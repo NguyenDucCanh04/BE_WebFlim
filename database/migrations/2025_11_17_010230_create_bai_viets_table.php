@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->string('anh_dai_dien')->nullable();
             $table->timestamp('ngay_dang');
             $table->unsignedBigInteger('tac_gia'); // admin
+            $table->integer('trang_thai')->default(1); // 1: active, 0: inactive    
             $table->timestamps();
 
             $table->foreign('tac_gia')->references('id')->on('admins')->onDelete('cascade');

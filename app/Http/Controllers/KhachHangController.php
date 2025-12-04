@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-
+use Illuminate\Support\Facades\Hash;
 
 class KhachHangController extends Controller
 {
@@ -42,9 +42,6 @@ class KhachHangController extends Controller
             ]);
         }
     }
-
-
-
     public function dangKy(KhachHangDangKyRequest $request)
     {
         $khachHang = KhachHang::create([
@@ -104,35 +101,7 @@ class KhachHangController extends Controller
             ]);
         }
     }
-    public function quenMK(Request $request)
-    {
-        $khach_hang = KhachHang::where('email', $request->email)->first();
 
-        if ($khach_hang) {
-
-            $hash_reset = Str::uuid();
-
-            // biến đúng
-            $x['ho_ten'] = $khach_hang->ho_ten;
-            $x['link'] = 'http://localhost:5173/khach-hang/doi-mat-khau/' . $hash_reset;
-
-            Mail::to($request->email)
-                ->send(new MasterMail('Đổi mật khẩu', 'quen_mat_khau', $x));
-
-            $khach_hang->hash_reset = $hash_reset;
-            $khach_hang->save();
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Vui lòng kiểm tra email của bạn'
-            ]);
-        }
-
-        return response()->json([
-            'status' => false,
-            'message' => 'Email không tồn tại trong hệ thống'
-        ]);
-    }
 
     public function logout(Request $request)
     {
@@ -152,26 +121,7 @@ class KhachHangController extends Controller
         }
     }
 
-    public function doiMK(KhachHangDoiMatKhauRequest $request)
-    {
-        $khachHang = KhachHang::where('hash_reset', $request->id)->first();
 
-        if (!$khachHang) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Link đặt lại mật khẩu không hợp lệ'
-            ]);
-        }
-
-        $khachHang->password = bcrypt($request->password);
-        $khachHang->hash_reset = null;
-        $khachHang->save();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Đổi mật khẩu thành công!'
-        ]);
-    }
     public function getData()
     {
         // ID chức năng 33: Xem Danh Sách Khách Hàng
@@ -348,7 +298,7 @@ class KhachHangController extends Controller
             ]);
         }
     }
-      public function dataKhachHang()
+    public function dataKhachHang()
     {
 
         $id_chuc_nang = 28;
@@ -369,7 +319,7 @@ class KhachHangController extends Controller
             'data' => $data
         ]);
     }
-     public function kichHoatTaiKhoan(Request $request)
+    public function kichHoatTaiKhoan(Request $request)
     {
 
         $id_chuc_nang = 29;
@@ -502,5 +452,67 @@ class KhachHangController extends Controller
                 'message' => "Có lỗi xảy ra!"
             ]);
         }
+    }
+   public function quenMK(Request $request)
+    {
+        $khach_hang = KhachHang::where('email', $request->email)->first();
+        if($khach_hang){
+            $hash_reset         = Str::uuid();
+            $x['ho_ten']     = $khach_hang->ho_ten;
+            $x['link']          = 'http://localhost:5173/khach-hang/doi-mat-khau/' . $hash_reset;
+            Mail::to($request->email)->send(new MasterMail('Đổi Mật Khẩu Của Bạn', 'quen_mat_khau', $x));
+            $khach_hang->hash_reset = $hash_reset;
+            $khach_hang->save();
+            return response()->json([
+                'status'    =>  true,
+                'message'   =>  'Vui Lòng kiểm tra lại email'
+            ]);
+        } else {
+            return response()->json([
+                'status'    =>  false,
+                'message'   =>  'Email không có trong hệ thống'
+            ]);
+        }
+    }
+
+    public function doiMK(KhachHangDoiMatKhauRequest $request)
+    {
+        $khachHang           = KhachHang::where('hash_reset', $request->id)->first();
+        $khachHang->password = bcrypt($request->password);
+        $khachHang->hash_reset = NULL;
+        $khachHang->save();
+
+        return response()->json([
+            'status'    =>  true,
+            'message'   =>  'Đã đổi mật khẩu thành công'
+        ]);
+    }
+
+    public function doiMatKhauProfile(Request $request)
+    {
+        $user = Auth::guard('sanctum')->user();// lấy khách hàng đang đăng nhậ
+        // validate
+        $request->validate([
+            'old_password' => 'required',
+            'new_password' => 'required|min:6',
+            'confirm_password' => 'same:new_password'
+        ]);
+
+        // kiểm tra mật khẩu cũ
+        if (!Hash::check($request->old_password, $user->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Mật khẩu cũ không chính xác!'
+            ]);
+        }
+
+        // cập nhật mật khẩu
+        $user->password = bcrypt($request->new_password);
+        $user->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Đổi mật khẩu thành công!'
+        ]);
     }
 }

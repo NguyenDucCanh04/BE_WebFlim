@@ -13,8 +13,9 @@ class BaiViet extends Model
         'noi_dung',
         'anh_dai_dien',
         'ngay_dang',
-        'tac_gia'
+        'tac_gia',
+        'trang_thai'
     ];
 
-    
+
 }

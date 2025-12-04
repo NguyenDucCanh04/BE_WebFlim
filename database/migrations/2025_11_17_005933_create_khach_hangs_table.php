@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string('anh_dai_dien')->nullable();
             $table->boolean('trang_thai')->default(1);
             $table->timestamps();
+            $table->string('hash_reset')->nullable();
         });
     }
 
